@@ -31,13 +31,25 @@ const SPEAKER_BY_ID = gql`
   }
 `;
 
+interface Session {
+  id: number
+  title: string
+}
+
+interface SpeakerType {
+  id: number
+  name: string
+  bio: string
+  sessions: Session[]
+}
+
 const SpeakerList = () => {
   const { loading, error, data } = useQuery(SPEAKERS);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
-  return data.speakers.map(({ id, name, bio, sessions }) => (
+  return data.speakers.map(({ id, name, bio, sessions }: SpeakerType) => (
     <div
       key={id}
       className="col-xs-12 col-sm-6 col-md-6"
@@ -67,8 +79,12 @@ const SpeakerList = () => {
   ));
 };
 
+interface SpeakerDetailType {
+  speaker_id: string
+}
+
 const SpeakerDetails = () => {
-  const { speaker_id } = useParams();
+  const { speaker_id } = useParams<SpeakerDetailType>();
   const { loading, error, data } = useQuery(SPEAKER_BY_ID, {
     variables: { id: speaker_id },
   });
@@ -81,7 +97,7 @@ const SpeakerDetails = () => {
     return <div>No speaker.</div>;
   }
 
-  const { id, name, bio, sessions } = speaker;
+  const { id, name, bio, sessions } = speaker as SpeakerType;
 
   return (
     <div key={id} className="col-xs-12" style={{ padding: 5 }}>
